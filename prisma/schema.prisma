@@ -1,0 +1,155 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id          Int     @id @default(autoincrement())
+  code        String  @unique
+  displayName String?
+  email       String  @unique
+  password    String
+  photoURL    String? @default("https://i.imgur.com/JGmoHaP.jpeg")
+  phoneNumber String?
+  country     String?
+  address     String?
+  state       String?
+  city        String?
+  zipCode     String?
+  about       String?
+  role        String  @default("USER")
+  isPublic    Boolean @default(true)
+
+  createdbyid Int?
+  createdby   user?    @relation("CreatedByUser", fields: [createdbyid], references: [id])
+  createdat   DateTime @default(now())
+
+  updatedbyid Int?
+  updatedby   user?    @relation("UpdatedByUser", fields: [updatedbyid], references: [id])
+  updatedat   DateTime @updatedAt
+
+  userscreated user[] @relation("CreatedByUser")
+  usersupdated user[] @relation("UpdatedByUser")
+
+  departmentscreated department[] @relation("CreatedByUser")
+  departmentsupdated department[] @relation("UpdatedByUser")
+
+  locationcreated location[] @relation("CreatedByUser")
+  locationupdated location[] @relation("UpdatedByUser")
+
+  toollistcreated toollist[] @relation("CreatedByUser")
+  toollistupdated toollist[] @relation("UpdatedByUser")
+
+  machinecreated machine[] @relation("CreatedByUser")
+  machineupdated machine[] @relation("UpdatedByUser")
+
+  machinetypecreated machinetype[] @relation("CreatedByUser")
+  machinetypeupdated machinetype[] @relation("UpdatedByUser")
+}
+
+model department {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  name        String?   @unique
+  createdbyid Int?      @default(1)
+  createdby   user?     @relation("CreatedByUser", fields: [createdbyid], references: [id])
+  createdat   DateTime  @default(now())
+  updatedbyid Int?      @default(1)
+  updatedby   user?     @relation("UpdatedByUser", fields: [updatedbyid], references: [id])
+  updatedat   DateTime  @updatedAt
+  machine     machine[]
+}
+
+model machinetype {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  name        String?   @unique
+  createdbyid Int?      @default(1)
+  createdby   user?     @relation("CreatedByUser", fields: [createdbyid], references: [id])
+  createdat   DateTime  @default(now())
+  updatedbyid Int?      @default(1)
+  updatedby   user?     @relation("UpdatedByUser", fields: [updatedbyid], references: [id])
+  updatedat   DateTime  @updatedAt
+  machine     machine[]
+}
+
+model location {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  subcode     String    @unique
+  name        String?   @unique
+  createdbyid Int?      @default(1)
+  createdby   user?     @relation("CreatedByUser", fields: [createdbyid], references: [id])
+  createdat   DateTime  @default(now())
+  updatedbyid Int?      @default(1)
+  updatedby   user?     @relation("UpdatedByUser", fields: [updatedbyid], references: [id])
+  updatedat   DateTime  @updatedAt
+  machine     machine[]
+}
+
+model toollist {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String?  @unique
+  createdbyid Int?     @default(1)
+  createdby   user?    @relation("CreatedByUser", fields: [createdbyid], references: [id])
+  createdat   DateTime @default(now())
+  updatedbyid Int?     @default(1)
+  updatedby   user?    @relation("UpdatedByUser", fields: [updatedbyid], references: [id])
+  updatedat   DateTime @updatedAt
+}
+
+model machine {
+  id                 Int          @id @default(autoincrement())
+  internalserial     String?      @unique
+  name               String?      @unique
+  remark             String?
+  location           location?     @relation(fields: [locationid], references: [id])
+  department         department?   @relation(fields: [departmentid], references: [id])
+  calibrateby        String?
+  calibrateperiod    String?
+  lastcalibrateddate String?
+  alertbefore        String?
+  rangofuse          String?
+  equipmentrang      String?
+  resolution         String?
+  accuracy           String?
+  relatedmachine     String?
+  brand              String?
+  model              String?
+  factoryserial      String?
+  risk               String?
+  suppliername       String?
+  price              Decimal?
+  purchasedate       DateTime?
+  warranty           Int?
+  budgettypename     String?
+  contractno         String?
+  expectedlife       Int?
+  unitprefixname     String?
+  minrange           String?
+  maxrange           String?
+  assetno            String?
+  referenceformpe    String?
+  refwino            String?
+  externalqrcode     String?
+  toolimage          String?
+  toolgps            String?
+  createdbyid        Int?         @default(1)
+  createdby          user?        @relation("CreatedByUser", fields: [createdbyid], references: [id])
+  createdat          DateTime     @default(now())
+  updatedbyid        Int?         @default(1)
+  updatedby          user?        @relation("UpdatedByUser", fields: [updatedbyid], references: [id])
+  updatedat          DateTime     @updatedAt
+  locationid         Int?
+  departmentid       Int?
+  machinetype        machinetype? @relation(fields: [machinetypeid], references: [id])
+  machinetypeid      Int?
+}
